@@ -9,7 +9,13 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as crons from "../crons.js";
+import type * as dev from "../dev.js";
+import type * as fixtures from "../fixtures.js";
+import type * as geo from "../geo.js";
 import type * as http from "../http.js";
+import type * as ingest from "../ingest.js";
+import type * as normalize from "../normalize.js";
 import type * as watchers from "../watchers.js";
 
 import type {
@@ -20,7 +26,13 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  crons: typeof crons;
+  dev: typeof dev;
+  fixtures: typeof fixtures;
+  geo: typeof geo;
   http: typeof http;
+  ingest: typeof ingest;
+  normalize: typeof normalize;
   watchers: typeof watchers;
 }>;
 
