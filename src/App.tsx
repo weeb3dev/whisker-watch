@@ -3,6 +3,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import {
   Authenticated,
   Unauthenticated,
+  useAction,
   useMutation,
   useQuery,
 } from "convex/react";
@@ -30,6 +31,9 @@ export default function App() {
       </Unauthenticated>
       <Authenticated>
         <PrefsForm />
+        <MatchBoard />
+        <IngestPanel />
+        <Outbox />
       </Authenticated>
       <footer className="footer">
         Coat and age are style preferences only. Whisker Watch makes no medical or
@@ -196,6 +200,120 @@ function PrefsForm() {
         <button type="submit">{watcher ? "Update watch" : "Start watching"}</button>
         {saved && <span className="saved">Saved ✓</span>}
       </form>
+    </section>
+  );
+}
+
+function MatchBoard() {
+  const rows = useQuery(api.matches.board);
+  if (rows === undefined) return <section className="card">Loading matches…</section>;
+  return (
+    <section className="card">
+      <h2>
+        Match radar <span className="live-dot" title="live via Convex subscription" />
+      </h2>
+      {rows.length === 0 ? (
+        <p className="dim">
+          No matches yet. Save a watch, then run a scan below — new cats appear
+          here the moment the matcher finds them, no refresh needed.
+        </p>
+      ) : (
+        <div className="board">
+          {rows.map((row) => (
+            <article className="match" key={row.matchId}>
+              {row.listing.photoUrl && (
+                <img src={row.listing.photoUrl} alt={row.listing.name} loading="lazy" />
+              )}
+              <div className="match-body">
+                <header>
+                  <a href={row.listing.url} target="_blank" rel="noreferrer">
+                    {row.listing.name}
+                  </a>
+                  <span className="score">{row.score}</span>
+                </header>
+                <p className="meta">
+                  {[
+                    row.listing.breed,
+                    row.listing.age,
+                    row.listing.city && `${row.listing.city}, ${row.listing.state}`,
+                    row.listing.source,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+                <ul>
+                  {row.reasons.map((reason) => (
+                    <li key={reason}>{reason}</li>
+                  ))}
+                </ul>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function IngestPanel() {
+  const runs = useQuery(api.ingest.recentRuns);
+  const runIngest = useAction(api.ingest.run);
+  const [scanning, setScanning] = useState(false);
+  return (
+    <section className="card">
+      <h2>Ingest</h2>
+      <button
+        type="button"
+        className="scan"
+        disabled={scanning}
+        onClick={() => {
+          setScanning(true);
+          void Promise.allSettled([
+            runIngest({ source: "petfinder" }),
+            runIngest({ source: "petsmart" }),
+          ]).finally(() => setScanning(false));
+        }}
+      >
+        {scanning ? "Scanning…" : "Scan now"}
+      </button>
+      <table className="runs">
+        <tbody>
+          {(runs ?? []).map((run) => (
+            <tr key={run._id}>
+              <td>{run.source}</td>
+              <td className={run.status === "failed" ? "bad" : "ok"}>{run.status}</td>
+              <td>{run.mode}</td>
+              <td>
+                {run.listingsFound} found · {run.listingsNew} new
+              </td>
+              <td className="dim">{new Date(run.startedAt).toLocaleTimeString()}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  );
+}
+
+function Outbox() {
+  const alerts = useQuery(api.alerts.myAlerts);
+  if (!alerts || alerts.length === 0) return null;
+  return (
+    <section className="card">
+      <h2>Alert outbox</h2>
+      <p className="dim">
+        Emails sent for your matches. Provider "outbox" is the logged mock;
+        set AgentMail credentials to send for real.
+      </p>
+      {alerts.map((alert) => (
+        <details className="alert" key={alert._id}>
+          <summary>
+            <span className={alert.status === "sent" ? "ok" : "bad"}>{alert.status}</span>{" "}
+            {alert.subject} <span className="dim">via {alert.provider}</span>
+          </summary>
+          <pre>{alert.body}</pre>
+        </details>
+      ))}
     </section>
   );
 }

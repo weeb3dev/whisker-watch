@@ -17,6 +17,7 @@ import type * as geo from "../geo.js";
 import type * as http from "../http.js";
 import type * as ingest from "../ingest.js";
 import type * as matcher from "../matcher.js";
+import type * as matches from "../matches.js";
 import type * as normalize from "../normalize.js";
 import type * as watchers from "../watchers.js";
 
@@ -36,6 +37,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   ingest: typeof ingest;
   matcher: typeof matcher;
+  matches: typeof matches;
   normalize: typeof normalize;
   watchers: typeof watchers;
 }>;
