@@ -231,9 +231,9 @@ const listingInput = v.object({
 export const upsertBatch = internalMutation({
   args: { listings: v.array(listingInput) },
   handler: async (ctx, { listings }) => {
-    let newCount = 0;
     let updatedCount = 0;
     const now = Date.now();
+    const newIds: Id<"listings">[] = [];
     for (const listing of listings) {
       const existing = await ctx.db
         .query("listings")
@@ -249,15 +249,19 @@ export const upsertBatch = internalMutation({
         });
         updatedCount++;
       } else {
-        await ctx.db.insert("listings", {
-          ...listing,
-          status: "available",
-          lastSeenAt: now,
-        });
-        newCount++;
+        newIds.push(
+          await ctx.db.insert("listings", {
+            ...listing,
+            status: "available",
+            lastSeenAt: now,
+          }),
+        );
       }
     }
-    return { newCount, updatedCount };
+    for (const listingId of newIds) {
+      await ctx.scheduler.runAfter(0, internal.matcher.matchListing, { listingId });
+    }
+    return { newCount: newIds.length, updatedCount };
   },
 });
 

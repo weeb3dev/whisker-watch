@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as alerts from "../alerts.js";
 import type * as auth from "../auth.js";
 import type * as crons from "../crons.js";
 import type * as dev from "../dev.js";
@@ -15,6 +16,7 @@ import type * as fixtures from "../fixtures.js";
 import type * as geo from "../geo.js";
 import type * as http from "../http.js";
 import type * as ingest from "../ingest.js";
+import type * as matcher from "../matcher.js";
 import type * as normalize from "../normalize.js";
 import type * as watchers from "../watchers.js";
 
@@ -25,6 +27,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  alerts: typeof alerts;
   auth: typeof auth;
   crons: typeof crons;
   dev: typeof dev;
@@ -32,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   geo: typeof geo;
   http: typeof http;
   ingest: typeof ingest;
+  matcher: typeof matcher;
   normalize: typeof normalize;
   watchers: typeof watchers;
 }>;
