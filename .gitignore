@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Secrets: never commit. Set via Cursor Cloud Agents > Secrets or `npx convex env set`.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
