@@ -19,7 +19,6 @@ import type * as ingest from "../ingest.js";
 import type * as matcher from "../matcher.js";
 import type * as matches from "../matches.js";
 import type * as normalize from "../normalize.js";
-import type * as siteAssets from "../siteAssets.js";
 import type * as watchers from "../watchers.js";
 
 import type {
@@ -40,7 +39,6 @@ declare const fullApi: ApiFromModules<{
   matcher: typeof matcher;
   matches: typeof matches;
   normalize: typeof normalize;
-  siteAssets: typeof siteAssets;
   watchers: typeof watchers;
 }>;
 
@@ -70,4 +68,6 @@ export declare const internal: FilterApi<
   FunctionReference<any, "internal">
 >;
 
-export declare const components: {};
+export declare const components: {
+  staticHosting: import("@convex-dev/static-hosting/_generated/component.js").ComponentApi<"staticHosting">;
+};
