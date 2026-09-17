@@ -8,6 +8,10 @@ moment a matching cat appears — before the cat is gone.
 Coat and age are style preferences only. Whisker Watch makes no medical or
 allergy claims.
 
+**Live:** https://kindly-panther-329.convex.site (backend
+https://kindly-panther-329.convex.cloud), served from `*.convex.site` by the
+`@convex-dev/static-hosting` component.
+
 ## How it works
 
 ```
@@ -105,16 +109,16 @@ Runbook (needs `CONVEX_DEPLOY_KEY` in the environment, or `npx convex login`):
 ```bash
 # 1. Build the frontend with the prod VITE_CONVEX_URL, deploy the backend, upload dist/
 npm run deploy
-# prints: Your app is now available at: https://<deployment>.convex.site
+# prints: Your app is now available at: https://kindly-panther-329.convex.site
 
 # 2. One-time prod auth setup: generate keys (jose snippet in Setup above), then
 npx convex env set JWT_PRIVATE_KEY --prod -- "$(cat /tmp/jwt_private_key.pem)"
 npx convex env set JWKS --prod -- "$(cat /tmp/jwks.json)"
-npx convex env set SITE_URL --prod https://<deployment>.convex.site
+npx convex env set SITE_URL --prod https://kindly-panther-329.convex.site
 rm /tmp/jwt_private_key.pem /tmp/jwks.json
 
 # 3. Confirm runtime keys are present (names only; never print values)
-npx convex env list --prod | cut -d= -f1
+npx convex env list --prod | grep -oE '^[A-Za-z_][A-Za-z0-9_]*='
 #   expect FIRECRAWL_API_KEY, AGENTMAIL_API_KEY, AGENTMAIL_INBOX_ID, OPENAI_API_KEY
 ```
 
@@ -122,7 +126,7 @@ Then verify on the live URL (sign up, save long-hair prefs, Scan now, board
 populates) and rerun the proof scripts against prod:
 
 ```bash
-CONVEX_URL=https://<deployment>.convex.cloud SITE_URL=https://<deployment>.convex.site \
+CONVEX_URL=https://kindly-panther-329.convex.cloud SITE_URL=https://kindly-panther-329.convex.site \
   node scripts/verify-ui.mjs
 ```
 
@@ -131,7 +135,8 @@ social post in `hackathon.md`.
 
 Notes:
 - `npx convex env list` prints values in full, including multi-line PEM keys.
-  Pipe through `cut -d= -f1` when checking which vars exist.
+  `cut -d= -f1` is unsafe here: a multi-line value's continuation lines still
+  print. Use `grep -oE '^[A-Za-z_][A-Za-z0-9_]*='` to list names only.
 - Convex AI Gateway is available to paid Convex plans only; on a free plan the
   `OPENAI_API_KEY` path is the one that runs.
 - Secrets never go in the repo: `.gitignore` excludes `.env*`, `*.pem`, `*.key`.

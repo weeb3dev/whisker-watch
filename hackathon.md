@@ -3,10 +3,10 @@
 - **Project:** Whisker Watch
 - **Event:** Convex All Gas Hackathon (sponsored by OpenAI, Firecrawl, AgentMail)
 - **What it does:** Live cat-adoption radar: save coat/age/distance preferences, Firecrawl ingests public shelter listings, Convex matches them in realtime, and AgentMail emails you before the cat is gone.
-- **Live app:** not deployed (pending: `https://<deployment>.convex.site`, see Submission status)
-- **Repo:** pending (public GitHub URL: `https://github.com/weeb3dev/whisker-watch`)
+- **Live app:** https://kindly-panther-329.convex.site
+- **Repo:** https://github.com/weeb3dev/whisker-watch
 - **Frontend:** Convex static hosting
-- **Convex deployment:** not deployed (pending `*.convex.cloud`)
+- **Convex deployment:** https://kindly-panther-329.convex.cloud
 - **Components:** @convex-dev/static-hosting
 - **Convex features:** schema, tables, indexes, queries, mutations, actions, HTTP actions, crons, scheduled functions, realtime queries
 - **Auth:** Convex Auth
@@ -14,7 +14,7 @@
 - **Demo video:** pending
 - **Social post:** pending
 - **Started:** 2026-09-11T01:20:27Z
-- **Last updated:** 2026-09-17T20:18:32Z
+- **Last updated:** 2026-09-17T21:30:00Z
 
 ## Log
 
@@ -76,16 +76,33 @@ cache headers on hashed assets, SPA fallback, auth routes intact, Playwright
 demo path still passes. Hardened `.gitignore` so env files and key material can
 never be committed. Convex features: registered component, HTTP actions.
 
+### 2026-09-17 - 48a9884
+Shipped to Convex cloud and verified the full pipeline live. `npm run deploy`
+built the SPA with the prod `VITE_CONVEX_URL`, deployed the backend, and
+uploaded `dist/` to Convex storage via `@convex-dev/static-hosting`; the app
+is live at https://kindly-panther-329.convex.site (backend
+https://kindly-panther-329.convex.cloud). Generated the RS256 auth keypair and
+set `JWT_PRIVATE_KEY`, `JWKS`, `SITE_URL` on the deployment (the four runtime
+keys were already set). Live proofs against the deployment: a Firecrawl
+Petfinder run recorded `mode: "live"` with 12 listings carrying
+source/url/coat/age/location; matches recorded with `scoredBy: "llm"` (real
+OpenAI re-scoring); the match board updated over a websocket push after a
+reset + rescan with no refresh; and AgentMail alerts reached `status: "sent"`
+with `provider: "agentmail"` (Amazon SES message ids) whose bodies link the
+listing URL, with the real emails delivered to the test recipient. All four
+`scripts/verify-*.mjs` pass against the deployment. Convex features: static
+hosting component, actions, crons, realtime queries.
+
 ## Stack checklist
 
 - [x] **Convex backend**: schema, indexes, queries, mutations, actions, crons, scheduled functions, realtime subscriptions.
 - [x] **Convex Auth**: password provider; watcher creation requires sign-in.
 - [x] **Firecrawl**: real scraping of Petfinder via `/v2/scrape` JSON extraction; PetSmart fixture fallback recorded on the IngestRun.
-- [x] **AgentMail**: real send path against `api.agentmail.to`; outbox mock when credentials are absent.
-- [x] **OpenAI**: optional LLM re-scoring of matches on top of deterministic rules.
+- [x] **AgentMail**: real send path against `api.agentmail.to`; outbox mock when credentials are absent. Verified live: alerts sent through AgentMail (Amazon SES message ids), bodies link the listing URL.
+- [x] **OpenAI**: optional LLM re-scoring of matches on top of deterministic rules. Verified live: matches recorded with `scoredBy: "llm"`.
 - [x] **Convex static hosting component**: frontend served from `*.convex.site`.
-- [ ] **Public GitHub repo**: pending push to `weeb3dev/whisker-watch`.
-- [ ] **Live URL on convex.site**: pending `npm run deploy` with `CONVEX_DEPLOY_KEY`.
+- [x] **Public GitHub repo**: https://github.com/weeb3dev/whisker-watch.
+- [x] **Live URL on convex.site**: https://kindly-panther-329.convex.site (served by `@convex-dev/static-hosting`).
 - [ ] **Demo video (under 3 min)** and **social post** tagging @convex @OpenAI @firecrawl @agentmail.
 - [ ] **Submitted at vibeapps.dev** before Sep 22 2026 12:00 PM PT.
 
@@ -93,17 +110,19 @@ never be committed. Convex features: registered component, HTTP actions.
 
 | Surface | URL | Status |
 | --- | --- | --- |
-| Live app (convex.site) | pending | deploy next: `npm run deploy` (README, "Deploying to Convex cloud") |
-| Convex deployment | pending | |
-| Public GitHub repo | `https://github.com/weeb3dev/whisker-watch` | pending push |
-| Demo video | pending | |
-| Social post | pending | |
+| Live app (convex.site) | https://kindly-panther-329.convex.site | live |
+| Convex deployment | https://kindly-panther-329.convex.cloud | live |
+| Public GitHub repo | https://github.com/weeb3dev/whisker-watch | pushed |
+| Demo video | pending | pending |
+| Social post | pending | pending |
+| vibeapps.dev submission | pending | pending (deadline Sep 22 2026 12:00 PM PT) |
 
-Everything above runs and is verified against a local anonymous Convex
-deployment in the dev environment (`http://127.0.0.1:3211`). The cloud deploy
-is one command once `CONVEX_DEPLOY_KEY` is present in the agent environment;
-runtime keys (Firecrawl, AgentMail, OpenAI) are already set on the Convex
-deployment.
+Everything above runs and is verified live against the Convex cloud
+deployment. `npm run deploy` shipped the backend and the SPA (served from
+`*.convex.site` by `@convex-dev/static-hosting`); runtime keys (Firecrawl,
+AgentMail, OpenAI) plus the auth keypair (`JWT_PRIVATE_KEY`, `JWKS`,
+`SITE_URL`) are set on the deployment. The four `scripts/verify-*.mjs` pass
+against it and the real alert emails were delivered to the test recipient.
 
 ## Verified (rerunnable scripts in `scripts/`)
 
