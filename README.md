@@ -97,12 +97,42 @@ node scripts/verify-ui.mjs           # real-browser demo path (Playwright, scree
 ## Deploying to Convex cloud
 
 The SPA is served by the Convex deployment itself on its `.convex.site` domain
-(see `convex/http.ts`). With a Convex account or `CONVEX_DEPLOY_KEY`:
+through the official [`@convex-dev/static-hosting`](https://github.com/get-convex/static-hosting)
+component (`convex/convex.config.ts`, `registerStaticRoutes` in `convex/http.ts`).
+
+Runbook (needs `CONVEX_DEPLOY_KEY` in the environment, or `npx convex login`):
 
 ```bash
-npx convex login                     # or: export CONVEX_DEPLOY_KEY=...
-npx convex deploy --cmd 'npm run build:site'
-# then set the env vars above on the prod deployment (SITE_URL = https://<name>.convex.site)
+# 1. Build the frontend with the prod VITE_CONVEX_URL, deploy the backend, upload dist/
+npm run deploy
+# prints: Your app is now available at: https://<deployment>.convex.site
+
+# 2. One-time prod auth setup: generate keys (jose snippet in Setup above), then
+npx convex env set JWT_PRIVATE_KEY --prod -- "$(cat /tmp/jwt_private_key.pem)"
+npx convex env set JWKS --prod -- "$(cat /tmp/jwks.json)"
+npx convex env set SITE_URL --prod https://<deployment>.convex.site
+rm /tmp/jwt_private_key.pem /tmp/jwks.json
+
+# 3. Confirm runtime keys are present (names only; never print values)
+npx convex env list --prod | cut -d= -f1
+#   expect FIRECRAWL_API_KEY, AGENTMAIL_API_KEY, AGENTMAIL_INBOX_ID, OPENAI_API_KEY
 ```
 
-The frontend is then live at `https://<deployment-name>.convex.site`.
+Then verify on the live URL (sign up, save long-hair prefs, Scan now, board
+populates) and rerun the proof scripts against prod:
+
+```bash
+CONVEX_URL=https://<deployment>.convex.cloud SITE_URL=https://<deployment>.convex.site \
+  node scripts/verify-ui.mjs
+```
+
+Finally record the live URL, Convex deployment URL, repo URL, demo video, and
+social post in `hackathon.md`.
+
+Notes:
+- `npx convex env list` prints values in full, including multi-line PEM keys.
+  Pipe through `cut -d= -f1` when checking which vars exist.
+- Convex AI Gateway is available to paid Convex plans only; on a free plan the
+  `OPENAI_API_KEY` path is the one that runs.
+- Secrets never go in the repo: `.gitignore` excludes `.env*`, `*.pem`, `*.key`.
+  In Cursor Cloud Agents, store `CONVEX_DEPLOY_KEY` as a Runtime Secret.
