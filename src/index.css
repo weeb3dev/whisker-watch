@@ -92,7 +92,8 @@ button[type="submit"]:disabled { opacity: 0.6; cursor: wait; }
 }
 .ghost:hover { color: var(--text); border-color: var(--dim); }
 
-.auth-card { max-width: 420px; }
+.auth-card { max-width: 420px; margin-inline: auto; }
+.auth-view { display: flex; justify-content: center; align-items: center; min-height: 55vh; }
 .auth-card .ghost { margin-top: 14px; }
 
 .error { color: var(--danger); margin: 0; font-size: 0.9rem; }

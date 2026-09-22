@@ -27,7 +27,9 @@ export default function App() {
         </Authenticated>
       </header>
       <Unauthenticated>
-        <AuthForm />
+        <div className="auth-view">
+          <AuthForm />
+        </div>
       </Unauthenticated>
       <Authenticated>
         <PrefsForm />
